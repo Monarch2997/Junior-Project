@@ -1,6 +1,7 @@
 package com.monarch;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,13 +12,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
 import java.io.IOException;
-import javafx.geometry.Point2D;
-import javafx.scene.transform.Affine;
-import javafx.scene.transform.Rotate;
 import javafx.scene.control.Button; 
-
+import javafx.event.EventHandler;  
+  
 
 /**
  * JavaFX App
@@ -25,6 +23,7 @@ import javafx.scene.control.Button;
 public class App extends Application {
 
     private static Scene scene;
+    private Boolean bColorChanceSwapped = false;
 
     @Override
     public void start(Stage primarystage) throws IOException {
@@ -41,8 +40,6 @@ public class App extends Application {
         primarystage.show();
         primarystage.setTitle("Skypad Network");
 
-        Button b = new Button("button"); 
-        
         Group root = new Group();
         Canvas canvas = new Canvas(screenWidth, screenHeight);
 
@@ -61,13 +58,40 @@ public class App extends Application {
             gc.stroke();
         });
 
-        pane.getChildren().addAll(canvas,b);
+        Button bClear = new Button("Clear Canvas");
+        bClear.setOnAction(new EventHandler<ActionEvent>() {  
+            @Override  
+            public void handle(ActionEvent arg0) {  
+                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); 
+            }  
+        });
+
+        Button bColorChance = new Button("Swap to Red");
+        bColorChance.setStyle("-fx-background-color: Color.BLACK; -fx-text-fill: white;");
+        bColorChance.setOnAction(new EventHandler<ActionEvent>() {  
+            @Override  
+            public void handle(ActionEvent arg0) {  
+                if(bColorChanceSwapped == false){
+                    gc.setStroke(Color.RED);
+                    bColorChance.setStyle("-fx-background-color: Color.RED; -fx-text-fill: white;");
+                    bColorChanceSwapped = true;
+                } else{
+                    gc.setStroke(Color.BLACK);
+                    bColorChance.setStyle("-fx-background-color: Color.BLACK; -fx-text-fill: white;");
+                    bColorChanceSwapped = false;
+                }
+            }  
+        });
+
+        pane.getChildren().addAll(canvas,bClear, bColorChance);
 
         drawShapes(gc);
 
         primarystage.setX(widthPosition);
         primarystage.setY(heightPosition);
         root.getChildren().add(canvas);
+        root.getChildren().add(bClear);
+        root.getChildren().add(bColorChance);
         primarystage.setScene(new Scene(root));
         primarystage.show();
     }
